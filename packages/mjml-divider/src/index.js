@@ -5,8 +5,6 @@ import widthParser from 'mjml-core/lib/helpers/widthParser'
 export default class MjDivider extends BodyComponent {
   static componentName = 'mj-divider'
 
-  static tagOmission = true
-
   static allowedAttributes = {
     'border-color': 'color',
     'border-style': 'string',
@@ -66,11 +64,11 @@ export default class MjDivider extends BodyComponent {
     const { parsedWidth, unit } = widthParser(width)
 
     switch (unit) {
-      case '%':
-        return `${
-          (parseInt(containerWidth, 10) * parseInt(parsedWidth, 10)) / 100 -
-          paddingSize
-        }px`
+      case '%': {
+        const effectiveWidth = parseInt(containerWidth, 10) - paddingSize
+        const percentMultiplier = parseInt(parsedWidth, 10) / 100
+        return `${effectiveWidth * percentMultiplier}px`
+      }
       case 'px':
         return width
       default:

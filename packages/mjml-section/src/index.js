@@ -112,7 +112,7 @@ export default class MjSection extends BodyComponent {
       this.getAttribute('background-color'),
       ...(this.hasBackground()
         ? [
-            `url(${this.getAttribute('background-url')})`,
+            `url('${this.getAttribute('background-url')}')`,
             this.getBackgroundString(),
             `/ ${this.getAttribute('background-size')}`,
             this.getAttribute('background-repeat'),
@@ -189,6 +189,9 @@ export default class MjSection extends BodyComponent {
 
   renderBefore() {
     const { containerWidth } = this.context
+    const bgcolorAttr = this.getAttribute('background-color')
+      ? { bgcolor: this.getAttribute('background-color') }
+      : {}
 
     return `
       <!--[if mso | IE]>
@@ -201,6 +204,7 @@ export default class MjSection extends BodyComponent {
           class: suffixCssClasses(this.getAttribute('css-class'), 'outlook'),
           style: { width: `${containerWidth}` },
           width: parseInt(containerWidth, 10),
+          ...bgcolorAttr,
         })}
       >
         <tr>

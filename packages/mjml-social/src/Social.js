@@ -95,7 +95,10 @@ export default class MjSocial extends BodyComponent {
       <![endif]-->
       ${this.renderChildren(children, {
         attributes: this.getSocialElementAttributes(),
-        renderer: (component) => `
+        renderer: (component) => 
+          component.constructor.isRawElement()
+            ? component.render()
+            : `
             <!--[if mso | IE]>
               <td>
             <![endif]-->
@@ -112,7 +115,9 @@ export default class MjSocial extends BodyComponent {
                   },
                 })}
               >
-                ${component.render()}
+                <tbody>
+                  ${component.render()}
+                </tbody>
               </table>
             <!--[if mso | IE]>
               </td>
@@ -139,9 +144,11 @@ export default class MjSocial extends BodyComponent {
           style: 'tableVertical',
         })}
       >
-        ${this.renderChildren(children, {
-          attributes: this.getSocialElementAttributes(),
-        })}
+        <tbody>
+          ${this.renderChildren(children, {
+            attributes: this.getSocialElementAttributes(),
+          })}
+        </tbody>
       </table>
     `
   }

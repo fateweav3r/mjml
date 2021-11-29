@@ -16,10 +16,17 @@ import { minify as htmlMinify } from 'html-minifier'
 import cheerio from 'cheerio'
 
 import MJMLParser from 'mjml-parser-xml'
-import MJMLValidator, { dependencies } from 'mjml-validator'
+import MJMLValidator, {
+  dependencies as globalDependencies,
+  assignDependencies,
+} from 'mjml-validator'
 import { handleMjml3 } from 'mjml-migrate'
 
-import components, { initComponent, registerComponent } from './components'
+import { initComponent } from './createComponent'
+import globalComponents, {
+  registerComponent,
+  assignComponents,
+} from './components'
 
 import suffixCssClasses from './helpers/suffixCssClasses'
 import mergeOutlookConditionnals from './helpers/mergeOutlookConditionnals'
@@ -104,9 +111,17 @@ export default function mjml2html(mjml, options = {}) {
     actualPath = '.',
     noMigrateWarn = false,
     preprocessors,
+    presets = [],
   } = {
     ...mjmlConfigOptions,
     ...options,
+  }
+
+  const components = { ...globalComponents }
+  const dependencies = assignDependencies({}, globalDependencies)
+  for (const preset of presets) {
+    assignComponents(components, preset.components)
+    assignDependencies(dependencies, preset.dependencies)
   }
 
   if (typeof mjml === 'string') {
@@ -251,6 +266,7 @@ export default function mjml2html(mjml, options = {}) {
   }
 
   const bodyHelpers = {
+    components,
     addMediaQuery(className, { parsedWidth, unit }) {
       globalDatas.mediaQueries[
         className
@@ -269,6 +285,7 @@ export default function mjml2html(mjml, options = {}) {
   }
 
   const headHelpers = {
+    components,
     add(attr, ...params) {
       if (Array.isArray(globalDatas[attr])) {
         globalDatas[attr].push(...params)
@@ -383,9 +400,10 @@ if (isNode) {
 }
 
 export {
-  components,
+  globalComponents as components,
   initComponent,
   registerComponent,
+  assignComponents,
   suffixCssClasses,
   handleMjmlConfig,
   initializeType,
